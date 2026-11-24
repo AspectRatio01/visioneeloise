@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#2d6a4f" />
+    <meta name="description" content="Visionè Eloise medicine dispenser control workspace" />
+    <title>Visionè Eloise · Dispenser control</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/png" href="./assets/eloise-logo-black.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="splash" class="splash" role="status" aria-label="Loading Visionè Eloise">
+      <img class="splash-logo" src="./assets/eloise-logo-black.png" alt="" aria-hidden="true" />
+      <p>VISIONÈ ELOISE</p>
+    </div>
+
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Visionè Eloise home">
+          <img class="brand-logo" src="./assets/eloise-logo-black.png" alt="" aria-hidden="true" />
+          <span>Visionè Eloise</span>
+        </a>
+        <nav class="status-cluster" aria-label="Device status">
+          <span class="status-pill" id="bleStatus"><i></i><b>Bluetooth</b><span>Offline</span></span>
+          <span class="status-pill" id="mlStatus"><i></i><b>Model</b><span>Idle</span></span>
+          <span class="status-pill" id="cameraStatus"><i></i><b>Camera</b><span>Off</span></span>
+        </nav>
+        <button class="connect-button" id="connectButton" type="button">
+          <span class="connect-icon" aria-hidden="true">+</span>
+          <span class="connect-label">Connect device</span>
+        </button>
+      </header>
+
+      <section class="intro" id="top">
+        <div>
+          <span class="eyebrow">Dynamis · dispenser control</span>
+          <h1>Care, in <em>motion.</em></h1>
+          <p>One calm place to connect, recognize, and deliver.</p>
+        </div>
+        <a class="intro-link" href="#controller"><span>Open controller</span><b aria-hidden="true">↓</b></a>
+      </section>
+
+      <section class="controller-frame" id="controller" aria-label="Dispenser control workspace">
+        <div class="frame-heading">
+          <div>
+            <span class="eyebrow">Live workspace</span>
+            <h2>Dispenser controller</h2>
+          </div>
+          <span class="privacy-note"><i aria-hidden="true"></i> Video stays on this device</span>
+        </div>
+
+        <div class="workspace">
+          <article class="camera-card">
+            <div class="camera-viewport" id="cameraViewport">
+              <video id="video" muted playsinline></video>
+              <div class="camera-placeholder" id="cameraPlaceholder">
+                <div class="camera-symbol" aria-hidden="true"><span></span></div>
+                <p>Camera awaiting access</p>
+                <small>Load a model to begin recognition</small>
+              </div>
+              <button class="flip-button" id="flipButton" type="button" title="Flip camera" aria-label="Flip camera">
+                <span aria-hidden="true">↻</span>
+              </button>
+              <div class="permission-banner" id="permissionBanner" hidden>
+                <p>Camera access was blocked.</p>
+                <button id="retryCamera" type="button">Try again</button>
+              </div>
+              <div class="live-badge" id="liveBadge" hidden><i></i> Live</div>
+            </div>
+
+            <div class="prediction-panel">
+              <div class="prediction-heading">
+                <div>
+                  <span class="eyebrow">Current prediction</span>
+                  <strong id="predValue">Waiting</strong>
+                </div>
+                <div class="confidence-readout">
+                  <span>Confidence</span>
+                  <strong id="predConf">—</strong>
+                </div>
+              </div>
+              <div class="probability-list" id="probabilityList">
+                <div class="probability-empty">Load a model to view class probabilities</div>
+              </div>
+            </div>
+
+            <div class="slider-grid">
+              <label class="range-control">
+                <span><b>Send interval</b><output id="intervalOutput">2.0s</output></span>
+                <input id="intervalSlider" type="range" min="1" max="10" value="2" step="0.5" />
+              </label>
+              <label class="range-control">
+                <span><b>Confidence threshold</b><output id="thresholdOutput">80%</output></span>
+                <input id="thresholdSlider" type="range" min="0.5" max="1" value="0.8" step="0.01" />
+              </label>
+            </div>
+          </article>
+
+          <aside class="side-column">
+            <article class="model-card">
+              <div class="section-heading">
+                <div>
+                  <span class="eyebrow">Recognition model</span>
+                  <h3>Model setup</h3>
+                </div>
+                <span class="secure-chip">Runs locally</span>
+              </div>
+              <label class="url-label" for="modelUrl">Teachable Machine URL</label>
+              <div class="url-row">
+                <input id="modelUrl" type="url" autocomplete="off" placeholder="Paste your model URL" />
+                <button class="load-button" id="loadButton" type="button">
+                  <span class="button-spinner" aria-hidden="true"></span>
+                  <span class="load-label">Load model</span>
+                </button>
+              </div>
+              <label class="toggle-row" for="audioToggle">
+                <span><b>Audio feedback</b><small>Chime when a command is sent</small></span>
+                <input id="audioToggle" type="checkbox" />
+                <i aria-hidden="true"></i>
+              </label>
+            </article>
+
+            <article class="log-card">
+              <div class="log-heading">
+                <div>
+                  <span class="eyebrow">Device telemetry</span>
+                  <h3>Activity log</h3>
+                </div>
+                <button id="clearLog" type="button">Clear</button>
+              </div>
+              <div class="activity-log" id="activityLog" role="log" aria-live="polite"></div>
+              <button class="disconnect-button" id="disconnectButton" type="button">Stop &amp; disconnect</button>
+            </article>
+          </aside>
+        </div>
+
+        <section class="manual-panel" aria-labelledby="manualTitle">
+          <div class="manual-heading">
+            <div>
+              <span class="eyebrow">Manual override</span>
+              <h3 id="manualTitle">Force call</h3>
+            </div>
+            <button class="add-name-button" id="addNameButton" type="button"><span aria-hidden="true">+</span> Add name</button>
+          </div>
+          <p class="manual-description">Send a specific class directly to the dispenser.</p>
+          <div class="name-grid" id="nameGrid"></div>
+        </section>
+      </section>
+
+      <section class="stats-band" aria-label="Controller at a glance">
+        <div class="stats-copy">
+          <span class="eyebrow">Built for a steady routine</span>
+          <h2>Simple by design.<br />Thoughtful at every step.</h2>
+          <p>Local recognition, clear controls, and a direct link to your dispenser.</p>
+        </div>
+        <div class="stat-capsules">
+          <div class="stat-capsule"><b>01</b><span>On-device<br />recognition</span></div>
+          <div class="stat-capsule"><b>20</b><span>Byte UART<br />packets</span></div>
+          <div class="stat-capsule"><b>60s</b><span>Refill flap<br />safety window</span></div>
+        </div>
+      </section>
+
+      <section class="faq-section" aria-labelledby="faqTitle">
+        <div class="faq-intro">
+          <span class="eyebrow">Quick guide</span>
+          <h2 id="faqTitle">Questions?<br />Answers.</h2>
+          <p>A few useful details for setting up your dispenser.</p>
+        </div>
+        <div class="faq-list">
+          <article class="faq-item">
+            <h3><button type="button" aria-expanded="false" aria-controls="faqAnswer1">What do I need to connect? <span aria-hidden="true">+</span></button></h3>
+            <div class="faq-answer" id="faqAnswer1" hidden><p>Open this app in Chrome or Edge over HTTPS (or localhost), then choose Connect device and select your BBC micro:bit.</p></div>
+          </article>
+          <article class="faq-item">
+            <h3><button type="button" aria-expanded="false" aria-controls="faqAnswer2">Where does recognition happen? <span aria-hidden="true">+</span></button></h3>
+            <div class="faq-answer" id="faqAnswer2" hidden><p>The Teachable Machine model and camera inference run in your browser. Video frames are not uploaded by this app.</p></div>
+          </article>
+          <article class="faq-item">
+            <h3><button type="button" aria-expanded="false" aria-controls="faqAnswer3">Can I send a command manually? <span aria-hidden="true">+</span></button></h3>
+            <div class="faq-answer" id="faqAnswer3" hidden><p>Yes. Use Force call in the controller to send a class name directly over the micro:bit UART connection.</p></div>
+          </article>
+          <article class="faq-item">
+            <h3><button type="button" aria-expanded="false" aria-controls="faqAnswer4">How do I keep the refill flap safe? <span aria-hidden="true">+</span></button></h3>
+            <div class="faq-answer" id="faqAnswer4" hidden><p>Configure the dispenser firmware to accept your authorized staff class and automatically close the flap after its safety window.</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="closing-cta">
+        <h2>Ready when<br />you are.</h2>
+        <a href="#controller" class="primary-button">Go to controller <span aria-hidden="true">↗</span></a>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-meta">
+          <span>Local-first dispenser control</span>
+          <span class="footer-brand"><img class="footer-logo" src="./assets/eloise-logo-white.png" alt="" aria-hidden="true" /> Visionè Eloise · Dynamis</span>
+        </div>
+        <div class="footer-wordmark" aria-hidden="true">ELOISE</div>
+      </footer>
+    </main>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
